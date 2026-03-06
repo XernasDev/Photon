@@ -25,8 +25,6 @@ public class GLFramebuffer implements IFramebuffer {
 
     private int framebufferId = 0;
 
-    private static int lastBoundFramebufferId = 0;
-
     public GLFramebuffer(int width, int height, List<FramebufferAttachment> attachments) {
         this.width = width;
         this.height = height;
@@ -57,7 +55,9 @@ public class GLFramebuffer implements IFramebuffer {
         }
 
         int status = GL45.glCheckNamedFramebufferStatus(framebufferId, GL45.GL_FRAMEBUFFER);
+
         if (status != GL45.GL_FRAMEBUFFER_COMPLETE) throw new GLException("Failed to create framebuffer: " + GLUtils.getError(status));
+        bind();
     }
 
     @Override
@@ -67,18 +67,17 @@ public class GLFramebuffer implements IFramebuffer {
         for (GLRenderbuffer renderbuffer : attachedRenderbuffers) renderbuffer.dispose();
         attachedTextures.clear();
         attachedRenderbuffers.clear();
+        if (GL45.glGetInteger(GL45.GL_FRAMEBUFFER_BINDING) == framebufferId) GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, 0);
         GL45.glDeleteFramebuffers(framebufferId);
     }
 
     public void bind() {
-        if (lastBoundFramebufferId == framebufferId) return;
+        if (GL45.glGetInteger(GL45.GL_FRAMEBUFFER_BINDING) == framebufferId) return;
         GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, framebufferId);
-        lastBoundFramebufferId = framebufferId;
     }
 
-    public void bindDefault() {
-        if (lastBoundFramebufferId == 0) return;
-        lastBoundFramebufferId = 0;
+    public static void bindDefault() {
+        if (GL45.glGetInteger(GL45.GL_FRAMEBUFFER_BINDING) == 0) return;
         GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, 0);
     }
 
@@ -110,15 +109,26 @@ public class GLFramebuffer implements IFramebuffer {
 
     @Override
     public void resize(int width, int height) throws PhotonException {
-        dispose();
+        boolean hadFramebuffer = framebufferId != 0;
+        if (hadFramebuffer) dispose();
         this.width = width;
         this.height = height;
-        start();
+        if (hadFramebuffer) start();
     }
 
     @Override
     public ITexture getAttachmentTexture(FramebufferAttachment attachment) {
         return attachedTextures.get(attachment);
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
     }
 
     public int getFramebufferId() {

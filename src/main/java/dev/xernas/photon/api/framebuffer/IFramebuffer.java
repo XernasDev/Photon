@@ -18,4 +18,7 @@ public interface IFramebuffer extends PhotonLogic {
 
     ITexture getAttachmentTexture(FramebufferAttachment attachment);
 
+    int getWidth();
+    int getHeight();
+
 }

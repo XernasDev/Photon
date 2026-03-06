@@ -10,7 +10,6 @@ public interface IShader extends PhotonLogic {
     ShaderModule getFragmentShaderModule();
 
     <T> IUniform<T> setUniform(String name, T value);
-    boolean useTexture(String name, ITexture texture, int slot);
 
     void changeShader(Shader shader) throws PhotonException;
 

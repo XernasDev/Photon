@@ -22,14 +22,16 @@ public class GLUtils {
     }
 
     public static void clear(Color color) {
-        clear();
+        GLFramebuffer.bindDefault();
         if (color != null) {
             GL45.glClearColor(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
             GL45.glClearDepth(1.0f);
         }
+        clear();
     }
 
     public static void clear(GLFramebuffer framebuffer, Color color) {
+        framebuffer.bind();
         GL45.glClearNamedFramebufferfv(framebuffer.getFramebufferId(), GL45.GL_COLOR, 0, new float[] {
                 color.getRed() / 255f,
                 color.getGreen() / 255f,
@@ -83,6 +85,7 @@ public class GLUtils {
             case GL45.GL_STACK_UNDERFLOW -> "Stack underflow";
             case GL45.GL_OUT_OF_MEMORY -> "Out of memory";
             case GL45.GL_INVALID_FRAMEBUFFER_OPERATION -> "Invalid framebuffer operation";
+            case GL45.GL_FRAMEBUFFER_COMPLETE -> "Frame buffer completed";
             case GL45.GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT -> "Frame buffer incomplete attachment";
             case GL45.GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT -> "Frame buffer incomplete missing attachment";
             case GL45.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER -> "Frame buffer incomplete draw buffer";

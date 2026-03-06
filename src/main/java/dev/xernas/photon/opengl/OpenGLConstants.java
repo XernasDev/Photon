@@ -8,7 +8,6 @@ public class OpenGLConstants {
 
     public static final DrawingMethod DRAWING_METHOD = DrawingMethod.ELEMENT;
     public static final DrawMode DRAW_MODE = DrawMode.TRIANGLES;
-    public static final GLFramebuffer DEFAULT_FRAMEBUFFER = new GLFramebuffer(0, 0, new ArrayList<>());
 
     public enum DrawingMethod {
         ARRAY,

@@ -14,7 +14,6 @@ import org.lwjgl.opengl.GL;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh, GLTexture> {
 
@@ -34,8 +33,12 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     }
 
     @Override
-    public void render(GLFramebuffer framebuffer, GLShader shader, GLMesh mesh, BiConsumer<GLMesh, GLShader> operations) {
-        framebuffer.bind();
+    public void render(GLFramebuffer framebuffer, GLShader shader, GLMesh mesh, Runnable operations) throws PhotonException {
+        resizeFramebuffers();
+        if (!((framebuffer == null || loadedFramebuffers.contains(framebuffer)) && loadedShaders.contains(shader) && loadedMeshes.contains(mesh)))
+            throw new PhotonException("Attempted to render with an unloaded resource");
+        if (framebuffer == null) GLFramebuffer.bindDefault();
+        else framebuffer.bind();
         // Binds
         shader.bind();
         if (mesh.getModel().is3D()) GLUtils.enableBackfaceCulling();
@@ -43,19 +46,13 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
         mesh.bind();
         // Operations
-        operations.accept(mesh, shader);
+        operations.run();
         // Draw call
         GLUtils.draw(0, mesh.getVertexCount());
     }
 
     @Override
-    public GLFramebuffer getDefaultFramebuffer() throws PhotonException {
-        return OpenGLConstants.DEFAULT_FRAMEBUFFER;
-    }
-
-    @Override
     public void swapBuffers() throws PhotonException {
-        resizeFramebuffers();
         GLFW.glfwSwapBuffers(window.getHandle());
     }
 
@@ -82,6 +79,13 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         if (!window.framebufferResized()) return;
         for (GLFramebuffer framebuffer : loadedFramebuffers) framebuffer.resize(window.getWidth(), window.getHeight());
         window.setFramebufferResized(false);
+    }
+
+    @Override
+    public boolean useTexture(String name, GLTexture texture, int slot, GLShader shader) throws PhotonException {
+        if (loadedTextures.contains(texture)) throw new PhotonException("Attempted to use an unloaded texture");
+        texture.bind(slot);
+        return shader.setUniform(name, slot) != null;
     }
 
     @Override
@@ -116,7 +120,33 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         return glTexture;
     }
 
+    @Override
+    public boolean unloadTexture(GLTexture texture) throws PhotonException {
+        boolean hadTexture = loadedTextures.remove(texture);
+        if (hadTexture) texture.dispose();
+        return hadTexture;
+    }
 
+    @Override
+    public boolean unloadMesh(GLMesh mesh) throws PhotonException {
+        boolean hadMesh = loadedMeshes.remove(mesh);
+        if (hadMesh) mesh.dispose();
+        return hadMesh;
+    }
+
+    @Override
+    public boolean unloadShader(GLShader shader) throws PhotonException {
+        boolean hadShader = loadedShaders.remove(shader);
+        if (hadShader) shader.dispose();
+        return hadShader;
+    }
+
+    @Override
+    public boolean unloadFramebuffer(GLFramebuffer framebuffer) throws PhotonException {
+        boolean hadFramebuffer = loadedFramebuffers.remove(framebuffer);
+        if (hadFramebuffer) framebuffer.dispose();
+        return hadFramebuffer;
+    }
 
     @Override
     public void dispose() throws PhotonException {

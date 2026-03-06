@@ -42,11 +42,6 @@ public class VulkanShader implements IShader {
     }
 
     @Override
-    public boolean useTexture(String name, ITexture texture, int slot) {
-        return false;
-    }
-
-    @Override
     public void changeShader(Shader shader) throws PhotonException {
 
     }

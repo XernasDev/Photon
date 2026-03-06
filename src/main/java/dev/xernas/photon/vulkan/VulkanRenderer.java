@@ -55,13 +55,8 @@ public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMe
     }
 
     @Override
-    public void render(IFramebuffer framebuffer, VulkanShader shader, IMesh mesh, BiConsumer<IMesh, VulkanShader> operations) throws PhotonException {
+    public void render(IFramebuffer framebuffer, VulkanShader shader, IMesh mesh, Runnable operations) throws PhotonException {
 
-    }
-
-    @Override
-    public IFramebuffer getDefaultFramebuffer() throws PhotonException {
-        return null;
     }
 
     @Override
@@ -89,6 +84,11 @@ public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMe
     }
 
     @Override
+    public boolean useTexture(String name, ITexture texture, int slot, VulkanShader shader) throws PhotonException {
+        return false;
+    }
+
+    @Override
     public ITexture loadTexture(Texture texture) throws PhotonException {
         return null;
     }
@@ -106,6 +106,26 @@ public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMe
     @Override
     public IFramebuffer loadFramebuffer(Framebuffer framebuffer) throws PhotonException {
         return null;
+    }
+
+    @Override
+    public boolean unloadTexture(ITexture texture) throws PhotonException {
+        return false;
+    }
+
+    @Override
+    public boolean unloadMesh(IMesh mesh) throws PhotonException {
+        return false;
+    }
+
+    @Override
+    public boolean unloadShader(VulkanShader shader) throws PhotonException {
+        return false;
+    }
+
+    @Override
+    public boolean unloadFramebuffer(IFramebuffer framebuffer) throws PhotonException {
+        return false;
     }
 
     public void recreateSwapChain() throws PhotonException {

@@ -52,13 +52,6 @@ public class GLShader implements IShader {
     }
 
     @Override
-    public boolean useTexture(String name, ITexture texture, int slot) {
-        GLTexture glTexture = (GLTexture) texture;
-        glTexture.bind(slot);
-        return setUniform(name, slot) != null;
-    }
-
-    @Override
     public void changeShader(Shader shader) throws PhotonException {
         GLShaderModule oldVertexShader = this.vertexShader;
         GLShaderModule oldFragmentShader = this.fragmentShader;

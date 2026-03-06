@@ -164,7 +164,6 @@ public class Window implements PhotonLogic {
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
-        GLFW.glfwSetWindowSize(handle, width, height);
         GLUtils.viewport(this);
     }
 
