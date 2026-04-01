@@ -1,14 +1,7 @@
 # Photon
-Photon is a lightweight Java graphics API wrapper designed to simplify rendering in game development and graphical apps.
+Photon is a lightweight java graphics library wrapper coded with the aim of being easy to use for everyone !
 
-It provides an abstraction layer over low-level graphics operations, making it easier to create and manage graphical content.
-
-## Main Features
-- **Simplified Graphics Rendering** - Provides an easy-to-use interface for rendering shapes, images, and text.
-####
-- **Modular Design** - Structured to allow easy integration and extension.
-####
-- **Lightweight** - Minimal dependencies to ensure fast performance and easy deployment.​
+Don't hesitate to go check out [Soup](https://github.com/XernasDev/Soup) which is a good exemple project that uses Photon !​
 
 ## How to use
 
