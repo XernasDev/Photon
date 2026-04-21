@@ -76,12 +76,12 @@ public class Transform {
     }
 
     public Transform setScale(float x, float y, float z) {
-        this.scale = new Vector3f(x, y, z);
+        this.scale.set(new Vector3f(x, y, z));
         return this;
     }
 
     public Transform setScale(float scale) {
-        this.scale = new Vector3f(scale, scale, scale);
+        this.scale.set(new Vector3f(scale, scale, scale));
         return this;
     }
 
@@ -101,23 +101,23 @@ public class Transform {
     }
 
     public void setPosition(Vector3f position) {
-        this.position = position;
+        this.position.set(position);
     }
 
     public void setPosition(float x, float y, float z) {
-        this.position = new Vector3f(x, y, z);
+        this.position.set(new Vector3f(x, y, z));
     }
 
     public void setRotation(Vector3f rotation) {
-        this.rotation = rotation;
+        this.rotation.set(rotation);
     }
 
     public void setRotation(float x, float y, float z) {
-        this.rotation = new Vector3f(x, y, z);
+        this.rotation.set(new Vector3f(x, y, z));
     }
 
     public void setScale(Vector3f scale) {
-        this.scale = scale;
+        this.scale.set(scale);
     }
 
     public Vector3f getPosition() {

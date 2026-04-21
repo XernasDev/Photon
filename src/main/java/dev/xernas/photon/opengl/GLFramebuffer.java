@@ -34,7 +34,9 @@ public class GLFramebuffer implements IFramebuffer {
     @Override
     public void start() throws PhotonException {
         if (width <= 0 || height <= 0) return;
+        System.out.println("Starting framebuffer: previousId=" + framebufferId + ", size=" + width + "x" + height + ", attachments=" + attachments);
         framebufferId = GL45.glCreateFramebuffers();
+        System.out.println("New framebuffer created with ID " + framebufferId);
         for (FramebufferAttachment attachment : attachments) {
             if (attachment.isTexture()) {
                 GLTexture.GLTextureComponent componentType = switch (attachment) {
@@ -54,7 +56,21 @@ public class GLFramebuffer implements IFramebuffer {
             }
         }
 
+        // Log attached resources
+        if (!attachedTextures.isEmpty()) {
+            for (Map.Entry<FramebufferAttachment, GLTexture> e : attachedTextures.entrySet()) {
+                System.out.println("Attached texture for " + e.getKey() + " -> textureId=" + e.getValue().getTextureId());
+            }
+        }
+        if (!attachedRenderbuffers.isEmpty()) {
+            for (GLRenderbuffer rb : attachedRenderbuffers) {
+                System.out.println("Attached renderbuffer -> id=" + rb.getRenderbufferId());
+            }
+        }
+
         int status = GL45.glCheckNamedFramebufferStatus(framebufferId, GL45.GL_FRAMEBUFFER);
+
+        System.out.println("Framebuffer status: " + GLUtils.getError(status) + " (" + status + ")");
 
         if (status != GL45.GL_FRAMEBUFFER_COMPLETE) throw new GLException("Failed to create framebuffer: " + GLUtils.getError(status));
         bind();
@@ -68,7 +84,11 @@ public class GLFramebuffer implements IFramebuffer {
         attachedTextures.clear();
         attachedRenderbuffers.clear();
         if (GL45.glGetInteger(GL45.GL_FRAMEBUFFER_BINDING) == framebufferId) GL45.glBindFramebuffer(GL45.GL_FRAMEBUFFER, 0);
+        System.out.println("Disposing framebuffer " + framebufferId);
         GL45.glDeleteFramebuffers(framebufferId);
+
+        framebufferId = 0;
+        System.out.println("Disposed framebuffer and reset id to " + framebufferId);
     }
 
     public void bind() {
@@ -110,10 +130,13 @@ public class GLFramebuffer implements IFramebuffer {
     @Override
     public void resize(int width, int height) throws PhotonException {
         boolean hadFramebuffer = framebufferId != 0;
-        if (hadFramebuffer) dispose();
         this.width = width;
         this.height = height;
-        if (hadFramebuffer) start();
+        if (hadFramebuffer) {
+            System.out.println("Resize to " + width + "x" + height);
+            dispose();
+            start();
+        }
     }
 
     @Override

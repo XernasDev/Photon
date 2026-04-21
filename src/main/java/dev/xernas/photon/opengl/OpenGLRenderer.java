@@ -12,7 +12,7 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL;
 
 import java.awt.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 
 public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh, GLTexture> {
@@ -25,6 +25,9 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     private final List<GLShader> loadedShaders = new ArrayList<>();
     private final List<GLMesh> loadedMeshes = new ArrayList<>();
     private final List<GLTexture> loadedTextures = new ArrayList<>();
+
+    private final Map<String, GLMesh> modelsToLoadedMeshesMap = new HashMap<>();
+    private final Map<String, Integer> meshesPerModelTagCounter = new HashMap<>();
 
     public OpenGLRenderer(Window window, boolean vsync, boolean debug) {
         this.window = window;
@@ -82,8 +85,8 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     }
 
     @Override
-    public boolean useTexture(String name, GLTexture texture, int slot, GLShader shader) throws PhotonException {
-        if (loadedTextures.contains(texture)) throw new PhotonException("Attempted to use an unloaded texture");
+    public boolean useTexture(String name, GLTexture texture, int slot, GLShader shader) {
+        if (loadedTextures.contains(texture)) return false; // TODO Better error handling
         texture.bind(slot);
         return shader.setUniform(name, slot) != null;
     }
@@ -106,9 +109,12 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public GLMesh loadMesh(Model model) throws PhotonException {
+        incrementMeshesPerModelTag(model.getModelTag());
+        if (modelsToLoadedMeshesMap.containsKey(model.getModelTag())) return modelsToLoadedMeshesMap.get(model.getModelTag());
         GLMesh glMesh = new GLMesh(model);
         glMesh.start();
         loadedMeshes.add(glMesh);
+        modelsToLoadedMeshesMap.put(model.getModelTag(), glMesh);
         return glMesh;
     }
 
@@ -129,6 +135,12 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public boolean unloadMesh(GLMesh mesh) throws PhotonException {
+        for (Map.Entry<String, GLMesh> model : new HashSet<>(modelsToLoadedMeshesMap.entrySet())) {
+            if (mesh.equals(model.getValue())) {
+                if (decreaseMeshesPerModelTag(model.getKey())) return true;
+                modelsToLoadedMeshesMap.remove(model.getKey());
+            }
+        }
         boolean hadMesh = loadedMeshes.remove(mesh);
         if (hadMesh) mesh.dispose();
         return hadMesh;
@@ -158,5 +170,22 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         loadedMeshes.clear();
         loadedShaders.clear();
         loadedFramebuffers.clear();
+        modelsToLoadedMeshesMap.clear();
+        meshesPerModelTagCounter.clear();
     }
+
+    private void incrementMeshesPerModelTag(String modelTag) {
+        Integer count = meshesPerModelTagCounter.get(modelTag);
+        if (count == null) count = 0;
+        meshesPerModelTagCounter.put(modelTag, count + 1);
+    }
+
+    private boolean decreaseMeshesPerModelTag(String modelTag) {
+        Integer count = meshesPerModelTagCounter.get(modelTag);
+        if (count == null) count = 0;
+        if (count == 0) return false;
+        meshesPerModelTagCounter.put(modelTag, count - 1);
+        return meshesPerModelTagCounter.get(modelTag) != 0;
+    }
+
 }

@@ -13,8 +13,6 @@ import java.util.List;
 
 public class GLMesh implements IMesh {
 
-    private static int lastBoundMeshId = 0;
-
     private final Model model;
 
     private VAO vao;
@@ -70,9 +68,8 @@ public class GLMesh implements IMesh {
     }
 
     public void bind() {
-        if (lastBoundMeshId == vao.getId()) return;
+        if (GL45.glGetInteger(GL45.GL_VERTEX_ARRAY_BINDING) == vao.getId()) return;
         GL45.glBindVertexArray(vao.getId());
-        lastBoundMeshId = vao.getId();
         GL45.glEnableVertexAttribArray(0);
         if (hasTexCoords()) GL45.glEnableVertexAttribArray(1);
     }
@@ -81,7 +78,6 @@ public class GLMesh implements IMesh {
         if (hasTexCoords()) GL45.glDisableVertexAttribArray(1);
         GL45.glDisableVertexAttribArray(0);
         GL45.glBindVertexArray(0);
-        lastBoundMeshId = 0;
     }
 
     @Override

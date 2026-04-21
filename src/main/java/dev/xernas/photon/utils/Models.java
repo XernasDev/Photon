@@ -16,7 +16,7 @@ public class Models {
                 0, 1, 2,
                 2, 3, 0
         };
-        return new Model(vertices, indices);
+        return new Model("hydrogenQuad", vertices, indices);
     }
     public static Model createQuad() {
         return createQuad(1.0f);
@@ -63,7 +63,7 @@ public class Models {
                 16, 17, 18,   16, 18, 19, // Top face
                 20, 21, 22,   20, 22, 23  // Bottom face
         };
-        return new Model(vertices, indices);
+        return new Model("hydrogenCube", vertices, indices);
     }
     public static Model createCube() {
         return createCube(1.0f);

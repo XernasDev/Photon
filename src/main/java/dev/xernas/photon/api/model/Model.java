@@ -1,7 +1,10 @@
 package dev.xernas.photon.api.model;
 
+import java.util.UUID;
+
 public class Model {
 
+    private final String modelTag;
     private final float[] vertices;
     private final int[] indices;
     private final float[] texCoords;
@@ -10,6 +13,11 @@ public class Model {
     private boolean flipV = true;
 
     public Model(Vertex[] vertices, int[] indices) {
+        this(UUID.randomUUID().toString(), vertices, indices);
+    }
+
+    public Model(String modelTag, Vertex[] vertices, int[] indices) {
+        this.modelTag = modelTag;
         this.vertices = new float[vertices.length * 3];
         this.texCoords = new float[vertices.length * 2];
         this.normals = new float[vertices.length * 3];
@@ -31,10 +39,19 @@ public class Model {
     }
 
     public Model(float[] vertices, int[] indices, float[] texCoords, float[] normals) {
+        this(UUID.randomUUID().toString(), vertices, indices, texCoords, normals);
+    }
+
+    public Model(String modelTag, float[] vertices, int[] indices, float[] texCoords, float[] normals) {
+        this.modelTag = modelTag;
         this.vertices = vertices;
         this.indices = indices;
         this.texCoords = texCoords;
         this.normals = normals;
+    }
+
+    public String getModelTag() {
+        return modelTag;
     }
 
     public float[] getVertices() {

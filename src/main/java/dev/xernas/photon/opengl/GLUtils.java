@@ -116,7 +116,7 @@ public class GLUtils {
             String messageStr = GLDebugMessageCallback.getMessage(length, message);
             printDetail(sb, "Message", messageStr);
 
-            if (severity == GL45.GL_DEBUG_SEVERITY_HIGH || severity == GL45.GL_DEBUG_SEVERITY_MEDIUM) {
+            if ((severity == GL45.GL_DEBUG_SEVERITY_HIGH || severity == GL45.GL_DEBUG_SEVERITY_MEDIUM) && (type != GL45.GL_DEBUG_TYPE_PERFORMANCE)) {
                 System.err.println(sb);
                 new GLException(messageStr).printStackTrace();
             } else System.out.println(sb);

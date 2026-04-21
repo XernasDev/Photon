@@ -86,6 +86,7 @@ public class Window implements PhotonLogic {
         handle = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL);
         if (handle == MemoryUtil.NULL) throw new PhotonException("Failed to create GLFW window");
 
+
         // Callbacks
         GLFW.glfwSetFramebufferSizeCallback(handle, (window, w, h) -> {
             if (w == 0 || h == 0) return;
