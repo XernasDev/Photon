@@ -84,7 +84,7 @@ public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMe
     }
 
     @Override
-    public boolean useTexture(String name, ITexture texture, int slot, VulkanShader shader) throws PhotonException {
+    public boolean useTexture(String name, ITexture texture, int slot, VulkanShader shader) {
         return false;
     }
 

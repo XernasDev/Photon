@@ -29,6 +29,8 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     private final Map<String, GLMesh> modelsToLoadedMeshesMap = new HashMap<>();
     private final Map<String, Integer> meshesPerModelTagCounter = new HashMap<>();
 
+    private final Map<String, GLShader> loadedShadersMap = new HashMap<>();
+
     public OpenGLRenderer(Window window, boolean vsync, boolean debug) {
         this.window = window;
         this.vsync = vsync;
@@ -44,7 +46,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         else framebuffer.bind();
         // Binds
         shader.bind();
-        if (mesh.getModel().is3D()) GLUtils.enableBackfaceCulling();
+        if (mesh.getModel().usePerspective()) GLUtils.enableBackfaceCulling();
         else GLUtils.disableBackfaceCulling();
 
         mesh.bind();
@@ -101,9 +103,11 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public GLShader loadShader(Shader shader) throws PhotonException {
+        if (loadedShadersMap.containsKey(shader.getName())) return loadedShadersMap.get(shader.getName());
         GLShader glShader = new GLShader(shader);
         glShader.start();
         loadedShaders.add(glShader);
+        loadedShadersMap.put(shader.getName(), glShader);
         return glShader;
     }
 
@@ -148,6 +152,9 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public boolean unloadShader(GLShader shader) throws PhotonException {
+        for (Map.Entry<String, GLShader> namedShader : new HashSet<>(loadedShadersMap.entrySet())) {
+            if (shader.equals(namedShader.getValue())) loadedShadersMap.remove(namedShader.getKey());
+        }
         boolean hadShader = loadedShaders.remove(shader);
         if (hadShader) shader.dispose();
         return hadShader;
@@ -172,6 +179,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         loadedFramebuffers.clear();
         modelsToLoadedMeshesMap.clear();
         meshesPerModelTagCounter.clear();
+        loadedShadersMap.clear();
     }
 
     private void incrementMeshesPerModelTag(String modelTag) {

@@ -4,13 +4,11 @@ import org.joml.Vector3f;
 
 public class Transform {
 
-    public final static float MINIMUM_SCALE = 0.1f;
-
     private final Vector3f defaultPos;
     private final Vector3f defaultRot;
-    private Vector3f position;
-    private Vector3f rotation;
-    private Vector3f scale;
+    private final Vector3f position;
+    private final Vector3f rotation;
+    private final Vector3f scale;
 
     public Transform() {
         this.position = new Vector3f(0, 0, 0);

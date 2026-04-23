@@ -29,7 +29,7 @@ public interface IRenderer<F extends IFramebuffer, S extends IShader, M extends 
         clear(Color.BLACK);
     }
 
-    boolean useTexture(String name, T texture, int slot, S shader) throws PhotonException;
+    boolean useTexture(String name, T texture, int slot, S shader);
 
     T loadTexture(Texture texture) throws PhotonException;
 

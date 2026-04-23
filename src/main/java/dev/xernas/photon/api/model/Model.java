@@ -11,6 +11,7 @@ public class Model {
     private final float[] normals;
 
     private boolean flipV = true;
+    private boolean usingPerspective = true;
 
     public Model(Vertex[] vertices, int[] indices) {
         this(UUID.randomUUID().toString(), vertices, indices);
@@ -78,7 +79,12 @@ public class Model {
         return normals;
     }
 
-    public boolean is3D() {
+    public void usePerspective(boolean perspective) {
+        this.usingPerspective = perspective;
+    }
+
+    public boolean usePerspective() {
+        if (usingPerspective) return true;
         return vertices[2] != 0f;
     }
 
