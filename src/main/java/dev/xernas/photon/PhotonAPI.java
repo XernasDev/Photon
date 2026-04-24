@@ -44,11 +44,6 @@ public class PhotonAPI {
         return debug;
     }
 
-    public static ITexture getTexture(Texture texture) {
-        if (!initialized) throw new IllegalStateException("PhotonAPI is not initialized. Call PhotonAPI.init() first.");
-        return library.createTexture(texture);
-    }
-
     public static IRenderer<IFramebuffer, IShader, IMesh, ITexture> getRenderer(Window window, boolean vsync) {
         if (!initialized) throw new IllegalStateException("PhotonAPI is not initialized. Call PhotonAPI.init() first.");
         return (IRenderer<IFramebuffer, IShader, IMesh, ITexture>) library.createRenderer(window, vsync, debug);

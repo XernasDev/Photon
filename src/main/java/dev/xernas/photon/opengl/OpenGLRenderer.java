@@ -88,7 +88,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public boolean useTexture(String name, GLTexture texture, int slot, GLShader shader) {
-        if (loadedTextures.contains(texture)) return false; // TODO Better error handling
+        if (!loadedTextures.contains(texture)) return false; // TODO Better error handling
         texture.bind(slot);
         return shader.setUniform(name, slot) != null;
     }

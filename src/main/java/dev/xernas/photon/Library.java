@@ -6,7 +6,6 @@ import dev.xernas.photon.api.IRenderer;
 import dev.xernas.photon.api.shader.IShader;
 import dev.xernas.photon.api.texture.ITexture;
 import dev.xernas.photon.api.texture.Texture;
-import dev.xernas.photon.exceptions.PhotonException;
 import dev.xernas.photon.opengl.GLTexture;
 import dev.xernas.photon.opengl.OpenGLRenderer;
 import dev.xernas.photon.api.window.Window;
@@ -57,15 +56,6 @@ public enum Library {
 
     public boolean isOpenGL() {
         return name().toLowerCase(Locale.ROOT).startsWith("opengl");
-    }
-
-    public ITexture createTexture(Texture texture) {
-        if (isVulkan()) {
-            // return new VulkanTexture(texture);
-        } else if (isOpenGL()) {
-            return new GLTexture(texture);
-        }
-        return null;
     }
 
     public IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> createRenderer(Window window, boolean vsync, boolean debug) {
