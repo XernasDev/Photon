@@ -31,6 +31,8 @@ public interface IRenderer<F extends IFramebuffer, S extends IShader, M extends 
 
     boolean useTexture(String name, T texture, int slot, S shader);
 
+    void empty();
+
     T loadTexture(Texture texture) throws PhotonException;
 
     M loadMesh(Model model) throws PhotonException;

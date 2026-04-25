@@ -94,6 +94,17 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     }
 
     @Override
+    public void empty() {
+        loadedTextures.clear();
+        loadedMeshes.clear();
+        loadedShaders.clear();
+        loadedFramebuffers.clear();
+        modelsToLoadedMeshesMap.clear();
+        meshesPerModelTagCounter.clear();
+        loadedShadersMap.clear();
+    }
+
+    @Override
     public GLFramebuffer loadFramebuffer(Framebuffer framebuffer) throws PhotonException {
         GLFramebuffer glFramebuffer = new GLFramebuffer(window.getWidth(), window.getHeight(), framebuffer.getAttachments());
         glFramebuffer.start();
@@ -173,13 +184,6 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         for (GLMesh mesh : loadedMeshes) mesh.dispose();
         for (GLShader shader : loadedShaders) shader.dispose();
         for (GLFramebuffer framebuffer : loadedFramebuffers) framebuffer.dispose();
-        loadedTextures.clear();
-        loadedMeshes.clear();
-        loadedShaders.clear();
-        loadedFramebuffers.clear();
-        modelsToLoadedMeshesMap.clear();
-        meshesPerModelTagCounter.clear();
-        loadedShadersMap.clear();
     }
 
     private void incrementMeshesPerModelTag(String modelTag) {

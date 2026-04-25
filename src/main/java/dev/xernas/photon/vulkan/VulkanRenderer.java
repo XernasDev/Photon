@@ -89,6 +89,11 @@ public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMe
     }
 
     @Override
+    public void empty() {
+
+    }
+
+    @Override
     public ITexture loadTexture(Texture texture) throws PhotonException {
         return null;
     }

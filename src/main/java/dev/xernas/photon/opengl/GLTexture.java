@@ -66,13 +66,10 @@ public class GLTexture implements ITexture {
 
     @Override
     public void dispose() throws PhotonException {
-        System.out.println("Disposing texture " + textureId);
         GL45.glDeleteTextures(textureId);
-        // If the deleted texture was considered the last bound one, reset tracking
         if (textureId == lastBoundTextureId) {
             lastBoundTextureId = 0;
             lastBoundUnit = -1;
-            System.out.println("Reset lastBoundTextureId and lastBoundUnit after disposing texture");
         }
     }
 
