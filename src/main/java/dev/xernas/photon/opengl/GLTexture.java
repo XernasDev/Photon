@@ -37,7 +37,7 @@ public class GLTexture implements ITexture {
         textureId = GL45.glCreateTextures(GL20.GL_TEXTURE_2D);
 
         int wrapMode = hasDefaultData ? GL20.GL_REPEAT : GL20.GL_CLAMP_TO_EDGE;
-        int textureFilter = hasDefaultData ? GL20.GL_LINEAR : (textureComponent == GLTextureComponent.DEPTH ? GL20.GL_NEAREST : GL20.GL_LINEAR);
+        int textureFilter = image.isNearestFiltering() ? GL20.GL_NEAREST : hasDefaultData ? GL20.GL_LINEAR : (textureComponent == GLTextureComponent.DEPTH ? GL20.GL_NEAREST : GL20.GL_LINEAR);
         if (textureComponent == GLTextureComponent.DEPTH) GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_COMPARE_MODE, GL20.GL_NONE);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_S, wrapMode);
         GL45.glTextureParameteri(textureId, GL20.GL_TEXTURE_WRAP_T, wrapMode);

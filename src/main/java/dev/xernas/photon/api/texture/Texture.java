@@ -8,6 +8,8 @@ public class Texture {
     private final int height;
     private final ByteBuffer data;
 
+    private boolean nearestFiltering;
+
     public Texture(int width, int height, ByteBuffer data) {
         this.width = width;
         this.height = height;
@@ -26,4 +28,12 @@ public class Texture {
         return data;
     }
 
+    public Texture setNearestFiltering(boolean nearestFiltering) {
+        this.nearestFiltering = nearestFiltering;
+        return this;
+    }
+
+    public boolean isNearestFiltering() {
+        return nearestFiltering;
+    }
 }

@@ -71,7 +71,7 @@ public class MatrixUtils {
             top = scale / aspectRatio;
         }
 
-        return new Matrix4f().identity().ortho(left, right, bottom, top, -1.0f, 1.0f);
+        return new Matrix4f().identity().ortho(left, right, bottom, top, -1.0f, 100.0f);
     }
 
 }

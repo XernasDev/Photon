@@ -4,8 +4,8 @@ import dev.xernas.photon.api.model.Model;
 
 public class Models {
 
-    public static Model createQuad(float size) {
-        float halfSize = size / 2.0f;
+    public static Model createQuad() {
+        float halfSize = 0.5f;
         Model.Vertex[] vertices = {
                 new Model.Vertex(-halfSize, -halfSize, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
                 new Model.Vertex(halfSize, -halfSize, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f),
@@ -18,12 +18,9 @@ public class Models {
         };
         return new Model("hydrogenQuad", vertices, indices);
     }
-    public static Model createQuad() {
-        return createQuad(1.0f);
-    }
 
-    public static Model createCube(float size) {
-        float halfSize = size / 2.0f;
+    public static Model createCube() {
+        float halfSize = 0.5f;
         Model.Vertex[] vertices = new Model.Vertex[]{
                 new Model.Vertex(-halfSize, -halfSize, halfSize, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Front face vert 1
                 new Model.Vertex(halfSize, -halfSize, halfSize, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f), // Front face vert 2
@@ -64,9 +61,6 @@ public class Models {
                 20, 21, 22,   20, 22, 23  // Bottom face
         };
         return new Model("hydrogenCube", vertices, indices);
-    }
-    public static Model createCube() {
-        return createCube(1.0f);
     }
 
 }
