@@ -30,6 +30,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     private final Map<String, Integer> meshesPerModelTagCounter = new HashMap<>();
 
     private final Map<String, GLShader> loadedShadersMap = new HashMap<>();
+    private final Map<String, Integer> shadersCounter = new HashMap<>();
 
     public OpenGLRenderer(Window window, boolean vsync, boolean debug) {
         this.window = window;
@@ -40,8 +41,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     @Override
     public void render(GLFramebuffer framebuffer, GLShader shader, GLMesh mesh, Runnable operations) throws PhotonException {
         resizeFramebuffers();
-        if (!((framebuffer == null || loadedFramebuffers.contains(framebuffer)) && loadedShaders.contains(shader) && loadedMeshes.contains(mesh)))
-            throw new PhotonException("Attempted to render with an unloaded resource");
+        if (!((framebuffer == null || loadedFramebuffers.contains(framebuffer)) && loadedShaders.contains(shader) && loadedMeshes.contains(mesh))) throw new PhotonException("Attempted to render with an unloaded resource");
         if (framebuffer == null) GLFramebuffer.bindDefault();
         else framebuffer.bind();
         // Binds
@@ -102,6 +102,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         modelsToLoadedMeshesMap.clear();
         meshesPerModelTagCounter.clear();
         loadedShadersMap.clear();
+        shadersCounter.clear();
     }
 
     @Override
@@ -114,6 +115,7 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public GLShader loadShader(Shader shader) throws PhotonException {
+        incrementShaderCount(shader.getName());
         if (loadedShadersMap.containsKey(shader.getName())) return loadedShadersMap.get(shader.getName());
         GLShader glShader = new GLShader(shader);
         glShader.start();
@@ -164,7 +166,10 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     @Override
     public boolean unloadShader(GLShader shader) throws PhotonException {
         for (Map.Entry<String, GLShader> namedShader : new HashSet<>(loadedShadersMap.entrySet())) {
-            if (shader.equals(namedShader.getValue())) loadedShadersMap.remove(namedShader.getKey());
+            if (shader.equals(namedShader.getValue())) {
+                if (decreaseShaderCount(namedShader.getKey())) return true;
+                loadedShadersMap.remove(namedShader.getKey());
+            }
         }
         boolean hadShader = loadedShaders.remove(shader);
         if (hadShader) shader.dispose();
@@ -198,6 +203,20 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         if (count == 0) return false;
         meshesPerModelTagCounter.put(modelTag, count - 1);
         return meshesPerModelTagCounter.get(modelTag) != 0;
+    }
+
+    private void incrementShaderCount(String shaderName) {
+        Integer count = shadersCounter.get(shaderName);
+        if (count == null) count = 0;
+        shadersCounter.put(shaderName, count + 1);
+    }
+
+    private boolean decreaseShaderCount(String shaderName) {
+        Integer count = shadersCounter.get(shaderName);
+        if (count == null) count = 0;
+        if (count == 0) return false;
+        shadersCounter.put(shaderName, count - 1);
+        return shadersCounter.get(shaderName) != 0;
     }
 
 }
