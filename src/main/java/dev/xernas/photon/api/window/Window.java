@@ -31,7 +31,6 @@ public class Window implements PhotonLogic {
     private final boolean resizable;
 
     private final String defaultTitle;
-    private final Input input;
     private String title;
     private int width;
     private int height;
@@ -52,7 +51,8 @@ public class Window implements PhotonLogic {
         this.title = title;
         this.width = width;
         this.height = height;
-        this.input = new Input(this, true);
+        Input.setWindow(this);
+        Input.setAzerty(true);
     }
 
     @Override
@@ -64,6 +64,7 @@ public class Window implements PhotonLogic {
             errorCallback.set();
         }
         if (!GLFW.glfwInit()) throw new PhotonException("Failed to initialize GLFW");
+        if (!Input.isInitialized()) throw new PhotonException("Input was not initialized");
 
         // Configure GLFW
         GLFW.glfwDefaultWindowHints();
@@ -94,17 +95,17 @@ public class Window implements PhotonLogic {
             resize(w, h);
         });
         // Keyboard
-        GLFW.glfwSetKeyCallback(handle, (window, key, scancode, action, mods) -> input.setKeyAction(Key.fromCode(key, input.isAzerty()), Action.fromCode(action)));
+        GLFW.glfwSetKeyCallback(handle, (window, key, scancode, action, mods) -> Input.setKeyAction(Key.fromCode(key, Input.isAzerty()), Action.fromCode(action)));
         // Mouse
-        GLFW.glfwSetMouseButtonCallback(handle, (window, button, action, mods) -> input.setKeyAction(Key.fromCode(button, input.isAzerty()), Action.fromCode(action)));
+        GLFW.glfwSetMouseButtonCallback(handle, (window, button, action, mods) -> Input.setKeyAction(Key.fromCode(button, Input.isAzerty()), Action.fromCode(action)));
         // Mouse position
         GLFW.glfwSetCursorPosCallback(handle, (window, xpos, ypos) -> {
-            input.setMousePosition(xpos, ypos);
+            Input.setMousePosition(xpos, ypos);
             if (cursorLocked) setCursorPosition(width / 2, height / 2);
         });
         // Scroll
         GLFW.glfwSetScrollCallback(handle, (window, xoffset, yoffset) -> {
-            input.setScrollDelta((float) xoffset, (float) yoffset);
+            Input.setScrollDelta((float) xoffset, (float) yoffset);
         });
 
         // Set default cursor
@@ -114,7 +115,7 @@ public class Window implements PhotonLogic {
 
     public void update(IRenderer<? extends IFramebuffer, ? extends IShader, ? extends IMesh, ? extends ITexture> renderer) throws PhotonException {
         renderer.swapBuffers();
-        input.updateInput();
+        Input.updateInput();
         GLFW.glfwPollEvents();
         try (MemoryStack stack = MemoryStack.stackPush()) {
             DoubleBuffer xCursor = stack.mallocDouble(1);
@@ -123,7 +124,7 @@ public class Window implements PhotonLogic {
             IntBuffer xWindow = stack.mallocInt(1);
             IntBuffer yWindow = stack.mallocInt(1);
             GLFW.glfwGetWindowPos(handle, xWindow, yWindow);
-            input.setAbsoluteMousePosition(xWindow.get(0) + (float) xCursor.get(0), yWindow.get(0) + (float) yCursor.get(0));
+            Input.setAbsoluteMousePosition(xWindow.get(0) + (float) xCursor.get(0), yWindow.get(0) + (float) yCursor.get(0));
         }
     }
 
@@ -193,10 +194,6 @@ public class Window implements PhotonLogic {
         return height;
     }
 
-    public Input getInput() {
-        return input;
-    }
-
     public void setCursorPosition(int x, int y) {
         GLFW.glfwSetCursorPos(handle, x, y);
     }
@@ -222,6 +219,10 @@ public class Window implements PhotonLogic {
         currentCursor = new Cursor(shape);
         currentCursor.start();
         GLFW.glfwSetCursor(handle, currentCursor.getHandle());
+    }
+
+    public CursorShape getCursorShape() {
+        return currentCursor.getShape();
     }
 
     public Vector2f getMaxBounds() {

@@ -28,4 +28,7 @@ public class Cursor implements PhotonLogic {
         return handle;
     }
 
+    public CursorShape getShape() {
+        return shape;
+    }
 }

@@ -1,10 +1,15 @@
 package dev.xernas.photon.utils;
 
+import dev.xernas.photon.api.DrawMode;
 import dev.xernas.photon.api.model.Model;
 
 public class Models {
 
     public static Model createQuad() {
+        return createQuad(Model.ModelSettings.ORTHO_SETTINGS);
+    }
+
+    public static Model createQuad(Model.ModelSettings settings) {
         float halfSize = 0.5f;
         Model.Vertex[] vertices = {
                 new Model.Vertex(-halfSize, -halfSize, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f),
@@ -16,7 +21,7 @@ public class Models {
                 0, 1, 2,
                 2, 3, 0
         };
-        return new Model("hydrogenQuad", vertices, indices);
+        return new Model("hydrogenQuad", vertices, indices, settings);
     }
 
     public static Model createCube() {

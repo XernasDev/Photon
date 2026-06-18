@@ -1,6 +1,7 @@
 package dev.xernas.photon.opengl;
 
 import dev.xernas.photon.PhotonAPI;
+import dev.xernas.photon.api.DrawMode;
 import dev.xernas.photon.api.IRenderer;
 import dev.xernas.photon.api.framebuffer.Framebuffer;
 import dev.xernas.photon.api.model.Model;
@@ -32,6 +33,9 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
     private final Map<String, GLShader> loadedShadersMap = new HashMap<>();
     private final Map<String, Integer> shadersCounter = new HashMap<>();
 
+    private final Map<Texture, GLTexture> loadedTexturesMap = new HashMap<>();
+    private final Map<Texture, Integer> texturesCounter = new HashMap<>();
+
     public OpenGLRenderer(Window window, boolean vsync, boolean debug) {
         this.window = window;
         this.vsync = vsync;
@@ -46,14 +50,14 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         else framebuffer.bind();
         // Binds
         shader.bind();
-        if (mesh.getModel().usePerspective()) GLUtils.enableBackfaceCulling();
+        if (mesh.getModel().getSettings().backfaceCulling()) GLUtils.enableBackfaceCulling();
         else GLUtils.disableBackfaceCulling();
 
         mesh.bind();
         // Operations
         operations.run();
         // Draw call
-        GLUtils.draw(0, mesh.getVertexCount());
+        GLUtils.draw(0, mesh.getVertexCount(), mesh.getModel().getSettings().drawMode());
     }
 
     @Override
@@ -99,10 +103,12 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         loadedMeshes.clear();
         loadedShaders.clear();
         loadedFramebuffers.clear();
-        modelsToLoadedMeshesMap.clear();
-        meshesPerModelTagCounter.clear();
-        loadedShadersMap.clear();
+        texturesCounter.clear();
+        loadedTexturesMap.clear();
         shadersCounter.clear();
+        loadedShadersMap.clear();
+        meshesPerModelTagCounter.clear();
+        modelsToLoadedMeshesMap.clear();
     }
 
     @Override
@@ -137,14 +143,23 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
 
     @Override
     public GLTexture loadTexture(Texture texture) throws PhotonException {
+        incrementTextureCount(texture);
+        if (loadedTexturesMap.containsKey(texture)) return loadedTexturesMap.get(texture);
         GLTexture glTexture = new GLTexture(texture);
         glTexture.start();
         loadedTextures.add(glTexture);
+        loadedTexturesMap.put(texture, glTexture);
         return glTexture;
     }
 
     @Override
     public boolean unloadTexture(GLTexture texture) throws PhotonException {
+        for (Map.Entry<Texture, GLTexture> tex : new HashSet<>(loadedTexturesMap.entrySet())) {
+            if (texture.equals(tex.getValue())) {
+                if (decreaseTextureCount(tex.getKey())) return true;
+                loadedTexturesMap.remove(tex.getKey());
+            }
+        }
         boolean hadTexture = loadedTextures.remove(texture);
         if (hadTexture) texture.dispose();
         return hadTexture;
@@ -217,6 +232,20 @@ public class OpenGLRenderer implements IRenderer<GLFramebuffer, GLShader, GLMesh
         if (count == 0) return false;
         shadersCounter.put(shaderName, count - 1);
         return shadersCounter.get(shaderName) != 0;
+    }
+
+    private void incrementTextureCount(Texture texture) {
+        Integer count = texturesCounter.get(texture);
+        if (count == null) count = 0;
+        texturesCounter.put(texture, count + 1);
+    }
+
+    private boolean decreaseTextureCount(Texture texture) {
+        Integer count = texturesCounter.get(texture);
+        if (count == null) count = 0;
+        if (count == 0) return false;
+        texturesCounter.put(texture, count - 1);
+        return texturesCounter.get(texture) != 0;
     }
 
 }

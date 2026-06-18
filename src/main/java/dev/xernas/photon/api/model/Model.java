@@ -1,5 +1,7 @@
 package dev.xernas.photon.api.model;
 
+import dev.xernas.photon.api.DrawMode;
+
 import java.util.UUID;
 
 public class Model {
@@ -9,15 +11,11 @@ public class Model {
     private final int[] indices;
     private final float[] texCoords;
     private final float[] normals;
+    private final ModelSettings settings;
 
     private boolean flipV = true;
-    private boolean usingPerspective = true;
 
-    public Model(Vertex[] vertices, int[] indices) {
-        this(UUID.randomUUID().toString(), vertices, indices);
-    }
-
-    public Model(String modelTag, Vertex[] vertices, int[] indices) {
+    public Model(String modelTag, Vertex[] vertices, int[] indices, ModelSettings settings) {
         this.modelTag = modelTag;
         this.vertices = new float[vertices.length * 3];
         this.texCoords = new float[vertices.length * 2];
@@ -37,18 +35,41 @@ public class Model {
             this.normals[i * 3 + 1] = v.normalY;
             this.normals[i * 3 + 2] = v.normalZ;
         }
+
+        this.settings = settings;
     }
 
-    public Model(float[] vertices, int[] indices, float[] texCoords, float[] normals) {
-        this(UUID.randomUUID().toString(), vertices, indices, texCoords, normals);
+    public Model(String modelTag, Vertex[] vertices, int[] indices) {
+        this(modelTag, vertices, indices, ModelSettings.DEFAULT_SETTINGS);
     }
 
-    public Model(String modelTag, float[] vertices, int[] indices, float[] texCoords, float[] normals) {
+    public Model(Vertex[] vertices, int[] indices, ModelSettings settings) {
+        this(UUID.randomUUID().toString(), vertices, indices, settings);
+    }
+
+    public Model(Vertex[] vertices, int[] indices) {
+        this(UUID.randomUUID().toString(), vertices, indices, ModelSettings.DEFAULT_SETTINGS);
+    }
+
+    public Model(String modelTag, float[] vertices, int[] indices, float[] texCoords, float[] normals, ModelSettings settings) {
         this.modelTag = modelTag;
         this.vertices = vertices;
         this.indices = indices;
         this.texCoords = texCoords;
         this.normals = normals;
+        this.settings = settings;
+    }
+
+    public Model(String modelTag, float[] vertices, int[] indices, float[] texCoords, float[] normals) {
+        this(modelTag, vertices, indices, texCoords, normals, ModelSettings.DEFAULT_SETTINGS);
+    }
+
+    public Model(float[] vertices, int[] indices, float[] texCoords, float[] normals, ModelSettings settings) {
+        this(UUID.randomUUID().toString(), vertices, indices, texCoords, normals, settings);
+    }
+
+    public Model(float[] vertices, int[] indices, float[] texCoords, float[] normals) {
+        this(UUID.randomUUID().toString(), vertices, indices, texCoords, normals, ModelSettings.DEFAULT_SETTINGS);
     }
 
     public String getModelTag() {
@@ -79,13 +100,8 @@ public class Model {
         return normals;
     }
 
-    public void usePerspective(boolean perspective) {
-        this.usingPerspective = perspective;
-    }
-
-    public boolean usePerspective() {
-        if (usingPerspective) return true;
-        return vertices[2] != 0f;
+    public ModelSettings getSettings() {
+        return settings;
     }
 
     public Model flipV() {
@@ -94,6 +110,14 @@ public class Model {
     }
 
     public record Vertex(float x, float y, float z, float u, float v, float normalX, float normalY, float normalZ) {
+
+    }
+
+    public record ModelSettings(DrawMode drawMode, boolean usePerspective, boolean backfaceCulling) {
+
+        public static final ModelSettings DEFAULT_SETTINGS = new ModelSettings(DrawMode.TRIANGLES, true, true);
+        public static final ModelSettings ORTHO_SETTINGS = new ModelSettings(DrawMode.TRIANGLES, false, true);
+        public static final ModelSettings FULL_PERSPECTIVE_SETTINGS = new ModelSettings(DrawMode.TRIANGLES, true, false);
 
     }
 

@@ -72,9 +72,11 @@ public class GLMesh implements IMesh {
         GL45.glBindVertexArray(vao.getId());
         GL45.glEnableVertexAttribArray(0);
         if (hasTexCoords()) GL45.glEnableVertexAttribArray(1);
+        if (hasNormals()) GL45.glEnableVertexAttribArray(2);
     }
 
     public void unbind() {
+        if (hasNormals()) GL45.glDisableVertexAttribArray(2);
         if (hasTexCoords()) GL45.glDisableVertexAttribArray(1);
         GL45.glDisableVertexAttribArray(0);
         GL45.glBindVertexArray(0);

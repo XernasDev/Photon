@@ -19,6 +19,7 @@ public enum Library {
     VULKAN_1_2("1.2"),
     VULKAN_1_3("1.3"),
     VULKAN_1_4("1.4"),
+    OPENGL_4_1("4.1"),
     OPENGL_4_5("4.5"),
     OPENGL_4_6("4.6");
 

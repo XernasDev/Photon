@@ -1,5 +1,6 @@
 package dev.xernas.photon.opengl;
 
+import dev.xernas.photon.api.DrawMode;
 import dev.xernas.photon.api.window.Window;
 import dev.xernas.photon.exceptions.GLException;
 import org.lwjgl.opengl.GL45;
@@ -12,9 +13,9 @@ public class GLUtils {
     private static boolean depthTestEnabled = false;
     private static boolean backfaceCullingEnabled = false;
 
-    public static void draw(int first, int count) {
-        if (OpenGLConstants.DRAWING_METHOD.equals(OpenGLConstants.DrawingMethod.ARRAY)) GL45.glDrawArrays(OpenGLConstants.DRAW_MODE.toOpenGLConstant(), first, count);
-        else GL45.glDrawElements(OpenGLConstants.DRAW_MODE.toOpenGLConstant(), count, GL45.GL_UNSIGNED_INT, first);
+    public static void draw(int first, int count, DrawMode mode) {
+        if (OpenGLConstants.DRAWING_METHOD.equals(OpenGLConstants.DrawingMethod.ARRAY)) GL45.glDrawArrays(mode.toGLDrawMode(), first, count);
+        else GL45.glDrawElements(mode.toGLDrawMode(), count, GL45.GL_UNSIGNED_INT, first);
     }
 
     public static void clear() {

@@ -19,6 +19,7 @@ import dev.xernas.photon.vulkan.swapchain.VulkanFramebuffers;
 import dev.xernas.photon.vulkan.swapchain.VulkanRenderPass;
 import dev.xernas.photon.vulkan.swapchain.VulkanSwapChain;
 import dev.xernas.photon.api.window.Window;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.awt.*;
@@ -55,7 +56,7 @@ public class VulkanRenderer implements IRenderer<IFramebuffer, VulkanShader, IMe
     }
 
     @Override
-    public void render(IFramebuffer framebuffer, VulkanShader shader, IMesh mesh, Runnable operations) throws PhotonException {
+    public void render(@Nullable IFramebuffer framebuffer, VulkanShader shader, IMesh mesh, Runnable operations) throws PhotonException {
 
     }
 

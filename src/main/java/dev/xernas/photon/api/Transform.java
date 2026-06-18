@@ -2,6 +2,9 @@ package dev.xernas.photon.api;
 
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Transform {
 
     private final Vector3f defaultPos;
@@ -9,6 +12,8 @@ public class Transform {
     private final Vector3f position;
     private final Vector3f rotation;
     private final Vector3f scale;
+
+    private final List<Transform> linked = new ArrayList<>();
 
     public Transform() {
         this.position = new Vector3f(0, 0, 0);
@@ -42,20 +47,33 @@ public class Transform {
         this.defaultRot = rotation;
     }
 
+    public void link(Transform other) {
+        this.linked.add(other);
+        other.defaultPos.set(new Vector3f(defaultPos).add(other.defaultPos));
+        other.defaultRot.set(new Vector3f(defaultRot).add(other.defaultRot));
+        other.position.set(new Vector3f(position).add(other.position));
+        other.rotation.set(new Vector3f(rotation).add(other.rotation));
+        other.scale.set(new Vector3f(scale).mul(other.scale));
+    }
+
     public void move(Vector3f position) {
         this.position.add(position);
+        for (Transform other : linked) other.position.add(position);
     }
 
     public void incPosition(float x, float y, float z) {
         this.position.add(x, y, z);
+        for (Transform other : linked) other.position.add(x, y, z);
     }
 
     public void rotate(Vector3f rotation) {
         this.rotation.add(rotation);
+        for (Transform other : linked) other.rotation.add(rotation);
     }
 
     public void incRotation(float x, float y, float z) {
         this.rotation.add(x, y, z);
+        for (Transform other : linked) other.rotation.add(x, y, z);
     }
 
     public Transform scale(Vector3f scale) {
@@ -64,11 +82,13 @@ public class Transform {
 
     public Transform scale(float x, float y, float z) {
         this.scale.mul(x, y, z);
+        for (Transform other : linked) other.scale.mul(x, y, z);
         return this;
     }
 
     public Transform scale(float scale) {
         this.scale.mul(scale);
+        for (Transform other : linked) other.scale.mul(scale);
         return this;
     }
 

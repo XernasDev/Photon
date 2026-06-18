@@ -1,7 +1,6 @@
 package dev.xernas.photon.api.window.input;
 
 import dev.xernas.photon.api.window.Window;
-import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.HashMap;
@@ -9,79 +8,84 @@ import java.util.Map;
 
 public class Input {
 
-    private final Window window;
-    private final boolean azerty;
-    private final Map<Key, Action> keyMap = new HashMap<>();
-    private final Mouse mouse;
-    private final Mouse absoluteMouse;
+    private static Window window;
+    private static Boolean azerty;
+    private static final Map<Key, Action> keyMap = new HashMap<>();
+    private static final Mouse mouse = new Mouse(0, 0);
+    private static final Mouse absoluteMouse = new Mouse(0, 0);
 
-    public Input(Window window, boolean azerty) {
-        this.window = window;
-        this.azerty = azerty;
-        this.mouse = new Mouse(0, 0);
-        this.absoluteMouse = new Mouse(0, 0);
+    public static void setWindow(Window window) {
+        Input.window = window;
     }
 
-    public void updateInput() {
+    public static void setAzerty(boolean azerty) {
+        Input.azerty = azerty;
+    }
+
+    public static boolean isInitialized() {
+        return window != null && azerty != null;
+    }
+
+    public static void updateInput() {
         if (keyMap.isEmpty()) return;
         keyMap.clear();
         resetScrollDelta();
     }
 
-    public Action getKeyAction(Key key) {
+    public static Action getKeyAction(Key key) {
         return keyMap.getOrDefault(key, Action.IDLE);
     }
 
-    public boolean isPressing(Key key) {
+    public static boolean isPressing(Key key) {
         if (key.isMouseButton()) return GLFW.glfwGetMouseButton(window.getHandle(), key.getQwerty()) == GLFW.GLFW_PRESS;
         else return GLFW.glfwGetKey(window.getHandle(), key.getQwerty()) == GLFW.GLFW_PRESS;
     }
 
-    public boolean hasReleased(Key key) {
+    public static boolean hasReleased(Key key) {
         return getKeyAction(key) == Action.RELEASE;
     }
 
-    public boolean hasHold(Key key) {
+    public static boolean hasHold(Key key) {
         return getKeyAction(key) == Action.HOLD;
     }
 
-    public boolean hasPressed(Key button) {
+    public static boolean hasPressed(Key button) {
         return getKeyAction(button) == Action.PRESS;
     }
 
-    public void setKeyAction(Key key, Action action) {
+    public static void setKeyAction(Key key, Action action) {
         keyMap.put(key, action);
     }
 
-    public void setMousePosition(double x, double y) {
+    public static void setMousePosition(double x, double y) {
         mouse.set((float) x, (float) y);
     }
 
-    public void setScrollDelta(float x, float y) {
+    public static void setScrollDelta(float x, float y) {
         mouse.setScrollDelta(x, y);
     }
 
-    public void resetScrollDelta() {
+    public static void resetScrollDelta() {
         mouse.setScrollDelta(0, 0);
     }
 
-    public void setAbsoluteMousePosition(double x, double y) {
+    public static void setAbsoluteMousePosition(double x, double y) {
         absoluteMouse.set((float) x, (float) y);
     }
 
-    public boolean isAzerty() {
+    public static boolean isAzerty() {
         return azerty;
     }
 
-    public Window getWindow() {
+    public static Window getWindow() {
         return window;
     }
 
-    public Mouse getMouse() {
+    public static Mouse getMouse() {
         return mouse;
     }
 
-    public Mouse getAbsoluteMouse() {
+    public static Mouse getAbsoluteMouse() {
         return absoluteMouse;
     }
 }
