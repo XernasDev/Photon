@@ -122,14 +122,16 @@ public class Transform {
 
     public void setPosition(Vector3f position) {
         this.position.set(position);
+        for (Transform other : linked) other.position.set(new Vector3f(position).add(other.defaultPos));
     }
 
     public void setRotation(Vector3f rotation) {
         this.rotation.set(rotation);
+        for (Transform other : linked) other.rotation.set(new Vector3f(rotation).add(defaultRot));
     }
 
     public void setRotation(float x, float y, float z) {
-        this.rotation.set(new Vector3f(x, y, z));
+        setRotation(new Vector3f(x, y, z));
     }
 
     public void setScale(Vector3f scale) {
